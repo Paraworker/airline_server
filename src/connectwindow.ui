@@ -23,47 +23,30 @@
    <item row="0" column="0" colspan="2">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="10,1">
-       <item>
-        <widget class="QLabel" name="label_5">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>20</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Connect to Database</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_10">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
+      <widget class="QLabel" name="label_5">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>20</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Connect to Database</string>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="verticalSpacer">
@@ -81,7 +64,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
-        <number>26</number>
+        <number>16</number>
        </property>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
@@ -102,19 +85,20 @@
           <widget class="QLabel" name="label">
            <property name="minimumSize">
             <size>
-             <width>115</width>
+             <width>110</width>
              <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>115</width>
+             <width>110</width>
              <height>16777215</height>
             </size>
            </property>
            <property name="font">
             <font>
-             <pointsize>16</pointsize>
+             <family>Noto Sans CJK SC</family>
+             <pointsize>14</pointsize>
             </font>
            </property>
            <property name="text">
@@ -123,28 +107,82 @@
           </widget>
          </item>
          <item>
-          <widget class="QTextEdit" name="textEdit_hostname">
+          <widget class="QLineEdit" name="lineEdit_hostname">
            <property name="minimumSize">
             <size>
              <width>250</width>
-             <height>36</height>
+             <height>0</height>
             </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>250</width>
-             <height>36</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>14</pointsize>
-            </font>
            </property>
           </widget>
          </item>
          <item>
           <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <spacer name="horizontalSpacer_11">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="minimumSize">
+            <size>
+             <width>110</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>110</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Noto Sans CJK SC</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>端口号：</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_port">
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_12">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -177,44 +215,34 @@
           <widget class="QLabel" name="label_2">
            <property name="minimumSize">
             <size>
-             <width>115</width>
+             <width>110</width>
              <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>115</width>
+             <width>110</width>
              <height>16777215</height>
             </size>
            </property>
            <property name="font">
             <font>
-             <pointsize>16</pointsize>
+             <family>Noto Sans CJK SC</family>
+             <pointsize>14</pointsize>
             </font>
            </property>
            <property name="text">
-            <string>数据库名称：</string>
+            <string>数据库名：</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QTextEdit" name="textEdit_dbname">
+          <widget class="QLineEdit" name="lineEdit_dbname">
            <property name="minimumSize">
             <size>
              <width>250</width>
-             <height>36</height>
+             <height>0</height>
             </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>250</width>
-             <height>36</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>14</pointsize>
-            </font>
            </property>
           </widget>
          </item>
@@ -252,19 +280,20 @@
           <widget class="QLabel" name="label_3">
            <property name="minimumSize">
             <size>
-             <width>115</width>
+             <width>110</width>
              <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>115</width>
+             <width>110</width>
              <height>16777215</height>
             </size>
            </property>
            <property name="font">
             <font>
-             <pointsize>16</pointsize>
+             <family>Noto Sans CJK SC</family>
+             <pointsize>14</pointsize>
             </font>
            </property>
            <property name="text">
@@ -273,23 +302,12 @@
           </widget>
          </item>
          <item>
-          <widget class="QTextEdit" name="textEdit_username">
+          <widget class="QLineEdit" name="lineEdit_username">
            <property name="minimumSize">
             <size>
              <width>250</width>
-             <height>36</height>
+             <height>0</height>
             </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>250</width>
-             <height>36</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>14</pointsize>
-            </font>
            </property>
           </widget>
          </item>
@@ -327,19 +345,20 @@
           <widget class="QLabel" name="label_4">
            <property name="minimumSize">
             <size>
-             <width>115</width>
+             <width>110</width>
              <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>115</width>
+             <width>110</width>
              <height>16777215</height>
             </size>
            </property>
            <property name="font">
             <font>
-             <pointsize>16</pointsize>
+             <family>Noto Sans CJK SC</family>
+             <pointsize>14</pointsize>
             </font>
            </property>
            <property name="text">
@@ -348,23 +367,12 @@
           </widget>
          </item>
          <item>
-          <widget class="QTextEdit" name="textEdit_password">
+          <widget class="QLineEdit" name="lineEdit_password">
            <property name="minimumSize">
             <size>
              <width>250</width>
-             <height>36</height>
+             <height>0</height>
             </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>250</width>
-             <height>36</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>14</pointsize>
-            </font>
            </property>
           </widget>
          </item>
@@ -417,7 +425,8 @@
         <widget class="QPushButton" name="pushButton_connect">
          <property name="font">
           <font>
-           <pointsize>14</pointsize>
+           <family>Noto Sans CJK SC</family>
+           <pointsize>12</pointsize>
           </font>
          </property>
          <property name="text">

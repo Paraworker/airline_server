@@ -5,7 +5,8 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QSqlDatabase>
-#include <QSql>
+#include <QSqlQuery>
+#include <QSqlError>
 #include "connectwindow.h"
 
 QT_BEGIN_NAMESPACE
@@ -30,6 +31,7 @@ private:
     QTcpSocket* clientSocket[10];
     QSqlDatabase* database;
     QString database_hostname;
+    int database_port;
     QString database_dbname;
     QString database_username;
     QString database_password;

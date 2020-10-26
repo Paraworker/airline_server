@@ -51,10 +51,23 @@ bool MainWindow::connect_to_database(){
     *database = QSqlDatabase::addDatabase("QMYSQL");
 
     ConnectWindow connectwindow;
-    connectwindow.set_pointer(&database_hostname,&database_dbname,&database_username,&database_password);
+    connectwindow.set_pointer(&database_hostname,&database_port,&database_dbname,&database_username,&database_password);
     connectwindow.exec();
 
-    return true;
+    database->setHostName(database_hostname);
+    database->setPort(database_port);
+    database->setDatabaseName(database_dbname);
+    database->setUserName(database_username);
+    database->setPassword(database_password);
+    bool check = database->open();
+    if(check){
+        return true;
+    }
+    else{
+        delete database;
+        database = nullptr;
+        return false;
+    }
 }
 
 bool MainWindow::set_socket(){
@@ -88,6 +101,12 @@ void MainWindow::after_newConnection(){
     connect(clientSocket[i],&QTcpSocket::readyRead,this,[=](){
         message_handle(i);
     });
+
+    connect(clientSocket[i],&QTcpSocket::disconnected,this,[=](){
+        clientSocket[i] = nullptr;
+        this->ui->listWidget->addItem("A client disconnected");
+    });
+
     this->ui->listWidget->addItem("A client connected!      " + QString("[%1]:%2").arg(ip).arg(port));
 }
 

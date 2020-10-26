@@ -15,11 +15,12 @@ class ConnectWindow : public QDialog
 public:
     explicit ConnectWindow(QWidget *parent = nullptr);
     ~ConnectWindow();
-    void set_pointer(QString* ip,QString* name,QString* username,QString* password);
+    void set_pointer(QString* hostname,int* port,QString* dbname,QString* username,QString* password);
 
 private:
     Ui::ConnectWindow *ui;
     QString* database_hostname;
+    int* database_port;
     QString* database_dbname;
     QString* database_username;
     QString* database_password;
