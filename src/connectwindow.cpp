@@ -18,16 +18,12 @@ ConnectWindow::~ConnectWindow()
 
 void ConnectWindow::on_pushButton_connect_clicked()
 {
-    this->close();
-}
-
-void ConnectWindow::closeEvent(QCloseEvent *event){
     *database_hostname = this->ui->lineEdit_hostname->text();
     *database_port = this->ui->lineEdit_port->text().toInt();
     *database_dbname = this->ui->lineEdit_dbname->text();
     *database_username = this->ui->lineEdit_username->text();
     *database_password = this->ui->lineEdit_password->text();
-    event->accept();
+    this->close();
 }
 
 void ConnectWindow::set_pointer(QString* hostname,int* port,QString* dbname,QString* username,QString* password){

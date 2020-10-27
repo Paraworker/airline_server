@@ -24,7 +24,6 @@ private:
     QString* database_dbname;
     QString* database_username;
     QString* database_password;
-    void closeEvent( QCloseEvent * event);
 
 private slots:
     void on_pushButton_connect_clicked();

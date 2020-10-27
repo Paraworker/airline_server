@@ -27,6 +27,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QString airline_name;
+    int server_port;
     QTcpServer* serverSocket;
     QTcpSocket* clientSocket[10];
     QSqlDatabase* database;
@@ -37,12 +39,12 @@ private:
     QString database_password;
     bool connect_to_database();
     bool set_socket();
-    int check_type(QString text);
+    int check_type(QString &text);
     void message_handle(int i);
 
-    void query(int i,QString text);
-    void order(int i,QString text);
-    void refund(int i,QString text);
+    void air_query(int i,QString &text);
+    void order(int i,QString &text);
+    void refund(int i,QString &text);
 
 };
 #endif // MAINWINDOW_H

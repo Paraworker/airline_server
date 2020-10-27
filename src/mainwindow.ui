@@ -20,7 +20,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="10,0">
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="label_title">
           <property name="font">
            <font>
             <pointsize>20</pointsize>
