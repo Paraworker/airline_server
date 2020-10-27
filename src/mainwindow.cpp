@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     airline_name = "中国南方航空";
-    server_port = 181035;
+    server_port = 18103;
     //根据不同航空公司修改
 
     this->ui->label_title->setText("Airline Server (" + airline_name + ")");
@@ -47,7 +47,6 @@ void MainWindow::on_startButton_clicked()
     }
     else{
         this->ui->listWidget->addItem("Socket listening...");
-        this->ui->listWidget->addItem("A client connected!");
 
         //this->ui->listWidget->addItem("查询结果已发回");
         //this->ui->listWidget->addItem("订票结果已发回");
@@ -99,6 +98,8 @@ void MainWindow::after_newConnection(){
     for(i = 0;i<10;i++){
         if(clientSocket[i] == nullptr){
             clientSocket[i] = serverSocket->nextPendingConnection();
+            QString addflag = "0%" + airline_name;
+            clientSocket[i]->write(addflag.toUtf8().data());    //发回航空公司名字
             break;
         }
         if(i == 9){
@@ -120,46 +121,87 @@ void MainWindow::after_newConnection(){
     this->ui->listWidget->addItem("A client connected!      " + QString("[%1]:%2").arg(ip).arg(port));
 }
 
-int MainWindow::check_type(QString &text){
+int MainWindow::check_type(QByteArray &text){
     if(text.startsWith("0#")){
         text =text.mid(2);
         return 0;
-    } else if(text.startsWith("1#")){
+    }
+    else if(text.startsWith("1#")){
         text =text.mid(2);
         return 1;
-    }else if(text.startsWith("2#")){
+    }
+    else if(text.startsWith("2#")){
         text =text.mid(2);
         return 2;
+    }
+    else{
+        return -1;
     }
 }
 
 void MainWindow::message_handle(int i){
     QByteArray array = clientSocket[i]->readAll();
-    QString text = array.data();
-    int type = check_type(text);
+    int type = check_type(array);
     if(type == 0){
-        air_query(i,text);
+        air_query(i,array);
     }else if (type == 1) {
-        order(i,text);
+        order(i,array);
     }else if(type == 2){
-        refund(i,text);
+        refund(i,array);
     }
 }
 
-void MainWindow::air_query(int i,QString &text){
-    this->ui->listWidget->addItem("[查询请求] 杭州 -> 武汉 2020/10/26 商务舱");
+void MainWindow::air_query(int i,QByteArray &text){
+    QByteArray info[4];    //Starting Terminal date seat_class
+    char* str = text.data();
+    int tag = 0;
+    while(*str != '\0'){
+        if(*str == ' '){
+            tag++;
+        }else{
+            info[tag] = info[tag] + *str;
+        }
+        str++;
+    }
+
+    this->ui->listWidget->addItem("[查询请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + get_seat_name(info[3]));
+
+
 
 
 }
 
-void MainWindow::order(int i,QString &text){
-    this->ui->listWidget->addItem("[订票请求] 杭州 -> 武汉 2020/10/26 17:20-20:30 商务舱 座位：17");
+void MainWindow::order(int i,QByteArray &text){
+    QByteArray info[6];    //Starting Terminal date flytime seat_class seat_number
+    char* str = text.data();
+    int tag = 0;
+    while(*str != '\0'){
+        if(*str == ' '){
+            tag++;
+        }else{
+            info[tag] = info[tag] + *str;
+        }
+        str++;
+    }
+    this->ui->listWidget->addItem("[订票请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + info[3] + get_seat_name(info[4]) + " 座位：" + info[5]);
 
 }
 
-void MainWindow::refund(int i,QString &text){
-    this->ui->listWidget->addItem("[退票请求] 订单号：000000000023");
+void MainWindow::refund(int i,QByteArray &text){
 
+
+    this->ui->listWidget->addItem("[退票请求] 订单号：" + text);
+
+}
+
+QString MainWindow::get_seat_name(QByteArray a){
+    if(a == "f"){
+        return seat_class[0];
+    }else if(a == "b"){
+        return seat_class[1];
+    }else if(a == "e"){
+        return seat_class[2];
+    }
 }
 
 

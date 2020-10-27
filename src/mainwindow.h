@@ -37,14 +37,17 @@ private:
     QString database_dbname;
     QString database_username;
     QString database_password;
+    const QString seat_class[3] = {"头等舱","商务舱","经济舱"};
+
     bool connect_to_database();
     bool set_socket();
-    int check_type(QString &text);
+    int check_type(QByteArray &text);
     void message_handle(int i);
 
-    void air_query(int i,QString &text);
-    void order(int i,QString &text);
-    void refund(int i,QString &text);
+    void air_query(int i,QByteArray &text);
+    void order(int i,QByteArray &text);
+    void refund(int i,QByteArray &text);
+    QString get_seat_name(QByteArray a);
 
 };
 #endif // MAINWINDOW_H
