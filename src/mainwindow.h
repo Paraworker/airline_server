@@ -8,6 +8,9 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include "connectwindow.h"
+#include <vector>
+
+using namespace std;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,7 +30,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    QString airline_name;
+    QByteArray airline_name;
     int server_port;
     QTcpServer* serverSocket;
     QTcpSocket* clientSocket[10];
@@ -37,6 +40,8 @@ private:
     QString database_dbname;
     QString database_username;
     QString database_password;
+
+
     const QString seat_class[3] = {"头等舱","商务舱","经济舱"};
 
     bool connect_to_database();
@@ -45,9 +50,17 @@ private:
     void message_handle(int i);
 
     void air_query(int i,QByteArray &text);
+    void show_seat(int i,QByteArray &text);
     void order(int i,QByteArray &text);
     void refund(int i,QByteArray &text);
     QString get_seat_name(QByteArray a);
+    int select_query(vector<QByteArray> &result,QByteArray sql);
+
+    int create_order_number(QByteArray& number);
+    int check_exsits(QByteArray sql);
+    int update_data(QByteArray sql);
+    int select_refound(vector<QByteArray> &result,QByteArray sql);
+    int select_show_seat(vector<QByteArray> &result,QByteArray sql);
 
 };
 #endif // MAINWINDOW_H
