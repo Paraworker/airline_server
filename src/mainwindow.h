@@ -54,13 +54,14 @@ private:
     void order(int i,QByteArray &text);
     void refund(int i,QByteArray &text);
     QString get_seat_name(QByteArray a);
-    int select_query(vector<QByteArray> &result,QByteArray sql);
+    int select_query(vector<QByteArray> &result,QString sql);
 
     int create_order_number(QByteArray& number);
-    int check_exsits(QByteArray sql);
-    int update_data(QByteArray sql);
-    int select_refound(vector<QByteArray> &result,QByteArray sql);
-    int select_show_seat(vector<QByteArray> &result,QByteArray sql);
+    QByteArray getRandomNumber();
+    int check_exsits(QString sql);
+    int update_data(QString sql);
+    int select_refound(vector<QByteArray> &result,QString sql);
+    int select_show_seat(vector<QByteArray> &result,QString sql);
 
 };
 #endif // MAINWINDOW_H

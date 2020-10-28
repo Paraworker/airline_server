@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMutex>
+#include <QTime>
+#include <QRandomGenerator>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -170,11 +172,11 @@ void MainWindow::air_query(int i,QByteArray &text){     //1%
     this->ui->listWidget->addItem("[查询航班信息请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + get_seat_name(info[3]));
 
     vector<QByteArray> result;
-    QByteArray query_select_sql;        //sql
+    QString query_select_sql= "SELECT distinct `starting`,`terminal`,`date`,`flytime`,`class` from ticket where `starting` = '" + info[0] + "' and terminal = '" + info[1] + "' and date = '" + info[2] + "' and class = '" + info[3] + "';";
+
     int check = select_query(result,query_select_sql);
     if(check == 1){
         QString b = "1%";
-        b = b + result.size() + " ";
         for (int j = 0;j < result.size() ; j++) {
             b = b + result[j] + " ";
         }
@@ -204,11 +206,10 @@ void MainWindow::show_seat(int i,QByteArray &text){     //2%
     this->ui->listWidget->addItem("[座位信息请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + info[3] + " " + get_seat_name(info[4]));
 
     vector<QByteArray> result;
-    QByteArray show_seat_select_sql;        //sql
+    QString show_seat_select_sql = "SELECT `seatnumber` from  ticket where `starting` = '" + info[0] + "' and terminal = '" + info[1] + "' and date = '" + info[2] + "' and flytime = '" + info[3] + "' and class = '" + info[4] +"';";        //sql
     int check = select_show_seat(result,show_seat_select_sql);
     if(check == 1){
         QString b1 = "2%";
-        b1 = b1 + result.size() + " ";
         for (int j = 0;j < result.size() ; j++) {
             b1 = b1 + result[j] + " ";
         }
@@ -236,7 +237,7 @@ void MainWindow::order(int i,QByteArray &text){     //3%
     }
     this->ui->listWidget->addItem("[订票请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + info[3] + get_seat_name(info[4]) + " 座位：" + info[5]);
 
-    QByteArray order_select_sql;        //sql
+    QString order_select_sql = "select * from  `ticket` where `starting` = '" + info[0] + "' and terminal = '" + info[1] + "' and date = '" + info[2] + "' and flytime = '" + info[3] + "' and class = '" + info[4] + "' and seatnumber = '" + info[5] + "';";        //sql
     int check = check_exsits(order_select_sql);
     if(check == 1){
         QByteArray order_number;
@@ -247,7 +248,7 @@ void MainWindow::order(int i,QByteArray &text){     //3%
             this->ui->listWidget->addItem("生成订单号时数据库操作失败，结果已发回");
             return;
         }
-        QByteArray order_update_sql;        //sql
+        QString order_update_sql = "UPDATE `ticket` SET `ordernumber` = '" + order_number + "' where starting = '"  + info[0] + "' and terminal = '" + info[1] + "' and date = '" + info[2] + "' and flytime = '" + info[3] + "' and class = '" + info[4] + "' and seatnumber = '" + info[5] + "';";        //sql
         int check2 = update_data(order_update_sql);
         if(check2 == 1){
             QByteArray b1 = "3%订票成功！订单号为：" + order_number;
@@ -272,10 +273,10 @@ void MainWindow::order(int i,QByteArray &text){     //3%
 
 void MainWindow::refund(int i,QByteArray &text){        //4%
     this->ui->listWidget->addItem("[退票请求] 订单号：" + text);
-    QByteArray refund_select_sql;       //sql
+    QString refund_select_sql = "select * from  ticket where `ordernumber` = '" + text + "';";       //sql
     int check = check_exsits(refund_select_sql);
     if(check == 1){
-        QByteArray refund_update_sql;       //sql
+        QByteArray refund_update_sql = "UPDATE `ticket` SET `ordernumber` = 'null' where ordernumber = '"  + text + "';";       //sql
         int check2 = update_data(refund_update_sql);
         if(check2 == 1){
             QByteArray b1 = "4%退票成功！";
@@ -307,7 +308,7 @@ QString MainWindow::get_seat_name(QByteArray a){
     }
 }
 
-int MainWindow::select_query(vector<QByteArray> &result,QByteArray sql)
+int MainWindow::select_query(vector<QByteArray> &result,QString sql)
 {
     QSqlQuery query(*database);
     QMutex mutex;
@@ -337,7 +338,7 @@ int MainWindow::select_query(vector<QByteArray> &result,QByteArray sql)
 }
 
 
-int MainWindow::update_data(QByteArray sql){
+int MainWindow::update_data(QString sql){
     QSqlQuery query(*database);
     QMutex mutex;
 
@@ -351,7 +352,7 @@ int MainWindow::update_data(QByteArray sql){
     return 1;
 }
 
-int MainWindow::check_exsits(QByteArray sql){
+int MainWindow::check_exsits(QString sql){
     QSqlQuery query(*database);
     QMutex mutex;
 
@@ -378,7 +379,7 @@ int MainWindow::check_exsits(QByteArray sql){
     }
 }
 
-int MainWindow::select_show_seat(vector<QByteArray> &result,QByteArray sql){
+int MainWindow::select_show_seat(vector<QByteArray> &result,QString sql){
     QSqlQuery query(*database);
     QMutex mutex;
 
@@ -404,13 +405,13 @@ int MainWindow::select_show_seat(vector<QByteArray> &result,QByteArray sql){
 
 
 int MainWindow::create_order_number(QByteArray& number){
-    QByteArray sql;
+    QString sql;
     QSqlQuery query(*database);
     QMutex mutex;
 
     while(true){
-        //number =
-        //sql =
+        number = getRandomNumber();
+        sql = "select * from  `ticket` where `ordernumber` = '" + number + "';";
         mutex.lock();
         bool isok = query.exec(sql);
         mutex.unlock();
@@ -429,6 +430,16 @@ int MainWindow::create_order_number(QByteArray& number){
             }
         }
     }
+}
+
+QByteArray MainWindow::getRandomNumber()
+{
+    QByteArray b;
+    for(int i=0; i<13; i++)
+    {
+        b = b + QByteArray::number(QRandomGenerator::global()->bounded(10));
+    }
+    return b;
 }
 
 
