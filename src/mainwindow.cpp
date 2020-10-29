@@ -179,7 +179,7 @@ void MainWindow::air_query(int i,QByteArray &text){     //1%
     if(check == 1){
         QString b = "1%";
         for (int j = 0;j < result.size() ; j++) {
-            b = b + info[0] + " " + info[1] + " " + info[2] + " " + result[j] + info[3] + " " + airline_id + " ";
+            b = b + info[0] + " " + info[1] + " " + info[2] + " " + result[j] + " " + info[3] + " " + airline_id + " ";
         }
 
         clientSocket[i]->write(b.toUtf8().data());
@@ -222,7 +222,7 @@ void MainWindow::show_seat(int i,QByteArray &text){     //2%
         if(check == 1){
             QString b1 = "2%";
             for (int j = 0;j < result.size() ; j++) {
-                b1 = b1 + result[j];
+                b1 = b1 + result[j] + " ";
             }
 
             clientSocket[i]->write(b1.toUtf8().data());
@@ -366,7 +366,6 @@ int MainWindow::sql_select(vector<QByteArray> &result,QString sql)
         while(query.next())
         {
             QByteArray b = query.value(0).toByteArray();
-            b = b + " ";
             result.push_back(b);
             tag++;
         }
