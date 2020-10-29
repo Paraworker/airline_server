@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     airline_name = "中国南方航空";
+    airline_id = "CZ";
     server_port = 18103;
     //根据不同航空公司修改
 
@@ -171,18 +172,23 @@ void MainWindow::air_query(int i,QByteArray &text){     //1%
 
     this->ui->listWidget->addItem("[查询航班信息请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + get_seat_name(info[3]));
 
-    vector<QByteArray> result;
-    QString query_select_sql= "SELECT distinct `starting`,`terminal`,`date`,`flytime`,`class` from ticket where `starting` = '" + info[0] + "' and terminal = '" + info[1] + "' and date = '" + info[2] + "' and class = '" + info[3] + "';";
+    vector<QByteArray> result;  //flytime
+    QString query_select_sql= "SELECT flight.`flytime` from flight,schedule where flight.`flightnumber` = schedule.`flightnumber` and flight.`starting` = '" + info[0] +  "' and flight.`terminal` = '" + info[1] + "' and schedule.`date` = '" + info[2] + "';";
 
-    int check = select_query(result,query_select_sql);
+    int check = sql_select(result,query_select_sql);
     if(check == 1){
         QString b = "1%";
         for (int j = 0;j < result.size() ; j++) {
-            b = b + result[j] + " ";
+            b = b + info[0] + " " + info[1] + " " + info[2] + " " + result[j] + info[3] + " " + airline_id + " ";
         }
 
         clientSocket[i]->write(b.toUtf8().data());
         this->ui->listWidget->addItem("查询航班信息成功，结果已发回");
+    }
+    else if(check == 0){
+        QString b = "1%";
+        clientSocket[i]->write(b.toUtf8().data());
+        this->ui->listWidget->addItem("查询航班信息成功（无内容），结果已发回");
     }
     else {
         QByteArray b = "5%数据库查询航班信息失败！";
@@ -205,21 +211,40 @@ void MainWindow::show_seat(int i,QByteArray &text){     //2%
     }
     this->ui->listWidget->addItem("[座位信息请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + info[3] + " " + get_seat_name(info[4]));
 
-    vector<QByteArray> result;
-    QString show_seat_select_sql = "SELECT `seatnumber` from  ticket where `starting` = '" + info[0] + "' and terminal = '" + info[1] + "' and date = '" + info[2] + "' and flytime = '" + info[3] + "' and class = '" + info[4] +"';";        //sql
-    int check = select_show_seat(result,show_seat_select_sql);
-    if(check == 1){
-        QString b1 = "2%";
-        for (int j = 0;j < result.size() ; j++) {
-            b1 = b1 + result[j] + " ";
-        }
 
-        clientSocket[i]->write(b1.toUtf8().data());
-        this->ui->listWidget->addItem("查询座位信息成功，结果已发回");
+    vector<QByteArray> this_scheduleid;
+    QString check_sql = "SELECT `scheduleid` from flight,schedule where flight.`flightnumber` = schedule.`flightnumber` and flight.`starting` = '" + info[0] +  "' and flight.`terminal` = '" + info[1] + "' and schedule.`date` = '" + info[2] + "' and flight.`flytime` = '" + info[3] + "';";
+    int check2 = sql_select(this_scheduleid,check_sql);
+    if(check2 == 1){
+        vector<QByteArray> result;      //存已经被订的座位
+        QString show_seat_select_sql = "SELECT `seatnumber` from order where `class` = '" + info[5] + "' and `scheduleid`  =  '" + this_scheduleid[0] +"';";
+        int check = sql_select(result,show_seat_select_sql);
+        if(check == 1){
+            QString b1 = "2%";
+            for (int j = 0;j < result.size() ; j++) {
+                b1 = b1 + result[j];
+            }
+
+            clientSocket[i]->write(b1.toUtf8().data());
+            this->ui->listWidget->addItem("查询座位信息成功，结果已发回");
+        }else if(check == 0){
+            QString b1 = "2%";
+            clientSocket[i]->write(b1.toUtf8().data());
+            this->ui->listWidget->addItem("查询座位信息成功（空内容），结果已发回");
+        }
+        else{
+            QByteArray b2 = "5%数据库查询座位信息时失败！";
+            clientSocket[i]->write(b2);
+            this->ui->listWidget->addItem("数据库查询座位信息时失败，结果已发回");
+        }
+    }else if(check2 == 0){
+        QByteArray b3 = "2%并不存在这趟航班！";
+        clientSocket[i]->write(b3);
+        this->ui->listWidget->addItem("并不存在这趟航班，结果已发回");
     }else{
-        QByteArray b2 = "5%数据库查询座位信息失败！";
-        clientSocket[i]->write(b2);
-        this->ui->listWidget->addItem("数据库查询座位信息失败，结果已发回");
+        QByteArray b5 = "5%检查航班是否存在时数据库操作失败！";
+        clientSocket[i]->write(b5);
+        this->ui->listWidget->addItem("检查航班是否存在时数据库操作失败，结果已发回");
     }
 }
 
@@ -237,47 +262,61 @@ void MainWindow::order(int i,QByteArray &text){     //3%
     }
     this->ui->listWidget->addItem("[订票请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + info[3] + get_seat_name(info[4]) + " 座位：" + info[5]);
 
-    QString order_select_sql = "select * from  `ticket` where `starting` = '" + info[0] + "' and terminal = '" + info[1] + "' and date = '" + info[2] + "' and flytime = '" + info[3] + "' and class = '" + info[4] + "' and seatnumber = '" + info[5] + "';";        //sql
-    int check = check_exsits(order_select_sql);
-    if(check == 1){
-        QByteArray order_number;
-        int check1 = create_order_number(order_number);
-        if(check1 == -1){
-            QByteArray msg = "5%生成订单号时数据库操作失败！";
-            clientSocket[i]->write(msg);
-            this->ui->listWidget->addItem("生成订单号时数据库操作失败，结果已发回");
-            return;
-        }
-        QString order_update_sql = "UPDATE `ticket` SET `ordernumber` = '" + order_number + "' where starting = '"  + info[0] + "' and terminal = '" + info[1] + "' and date = '" + info[2] + "' and flytime = '" + info[3] + "' and class = '" + info[4] + "' and seatnumber = '" + info[5] + "';";        //sql
-        int check2 = update_data(order_update_sql);
-        if(check2 == 1){
-            QByteArray b1 = "3%订票成功！订单号为：" + order_number;
-            clientSocket[i]->write(b1);
-            this->ui->listWidget->addItem("订票成功，结果已发回");
-        }else{
-            QByteArray b2 = "5%选座位时数据库操作失败！";
-            clientSocket[i]->write(b2);
-            this->ui->listWidget->addItem("选座位时数据库操作失败，结果已发回");
-        }
-    }else if (check == 0) {
-        QByteArray b3 = "3%该座位已被选！";
-        clientSocket[i]->write(b3);
-        this->ui->listWidget->addItem("座位已被选，结果已发回");
-    }else{
-        QByteArray b5 = "5%查询座位时数据库操作失败！";
-        clientSocket[i]->write(b5);
-        this->ui->listWidget->addItem("查询座位时数据库操作失败，结果已发回");
-    }
 
+    vector<QByteArray> this_scheduleid;
+    QString check_sql = "SELECT `scheduleid` from flight,schedule where flight.`flightnumber` = schedule.`flightnumber` and flight.`starting` = '" + info[0] +  "' and flight.`terminal` = '" + info[1] + "' and schedule.`date` = '" + info[2] + "' and flight.`flytime` = '" + info[3] + "';";
+    int check1 = sql_select(this_scheduleid,check_sql);
+    if(check1 == 1){
+        QString order_select_sql = "SELECT `scheduleid` from order where `scheduleid`  = '" + this_scheduleid[0] + "' and `class` = '" + info[4] + "' and `seatnumber` = '" + info[5] + "';";
+        int check = sql_select(order_select_sql);
+        if(check == 0){
+            QByteArray order_number;
+            int check1 = create_order_number(order_number);
+            if(check1 == -1){
+                QByteArray msg = "5%生成订单号时数据库操作失败！";
+                clientSocket[i]->write(msg);
+                this->ui->listWidget->addItem("生成订单号时数据库操作失败，结果已发回");
+                return;
+            }
+            QString order_insert_sql = "INSERT INTO order values('" + order_number + "','" + this_scheduleid[0] + "','" + info[4] + "','" +info[5] + "');";
+            int check2 = sql_operation(order_insert_sql);
+            if(check2 == 1){
+                QByteArray b1 = "3%订票成功！订单号为：" + order_number;
+                clientSocket[i]->write(b1);
+                this->ui->listWidget->addItem("订票成功，结果已发回");
+            }else{
+                QByteArray b2 = "5%写入订单时数据库操作失败！";
+                clientSocket[i]->write(b2);
+                this->ui->listWidget->addItem("写入订单时数据库操作失败，结果已发回");
+            }
+        }else if (check == 1) {
+            QByteArray b3 = "3%该座位已被选！";
+            clientSocket[i]->write(b3);
+            this->ui->listWidget->addItem("座位已被选，结果已发回");
+        }else{
+            QByteArray b5 = "5%查询座位时数据库操作失败！";
+            clientSocket[i]->write(b5);
+            this->ui->listWidget->addItem("查询座位时数据库操作失败，结果已发回");
+        }
+
+    }else if(check1 == 0){
+            QByteArray b3 = "3%并不存在这趟航班！";
+            clientSocket[i]->write(b3);
+            this->ui->listWidget->addItem("并不存在这趟航班，结果已发回");
+    }else{
+            QByteArray b5 = "5%检查航班是否存在时数据库操作失败！";
+            clientSocket[i]->write(b5);
+            this->ui->listWidget->addItem("检查航班是否存在时数据库操作失败，结果已发回");
+    }
 }
 
 void MainWindow::refund(int i,QByteArray &text){        //4%
     this->ui->listWidget->addItem("[退票请求] 订单号：" + text);
-    QString refund_select_sql = "select * from  ticket where `ordernumber` = '" + text + "';";       //sql
-    int check = check_exsits(refund_select_sql);
+    QString refund_select_sql = "SELECT `ordernumber` from  order where `ordernumber` = '" + text + "';";       //sql
+    int check = sql_select(refund_select_sql);
     if(check == 1){
-        QByteArray refund_update_sql = "UPDATE `ticket` SET `ordernumber` = 'null' where ordernumber = '"  + text + "';";       //sql
-        int check2 = update_data(refund_update_sql);
+        QByteArray refund_update_sql = "DELETE FROM order where ordernumber = '"  + text + "';";
+        int check2 = sql_operation(refund_update_sql);
         if(check2 == 1){
             QByteArray b1 = "4%退票成功！";
             clientSocket[i]->write(b1);
@@ -308,7 +347,7 @@ QString MainWindow::get_seat_name(QByteArray a){
     }
 }
 
-int MainWindow::select_query(vector<QByteArray> &result,QString sql)
+int MainWindow::sql_select(vector<QByteArray> &result,QString sql)
 {
     QSqlQuery query(*database);
     QMutex mutex;
@@ -319,26 +358,29 @@ int MainWindow::select_query(vector<QByteArray> &result,QString sql)
 
     if(!isok)
     {
-        return 0;
+        return -1;
     }
     else
     {
+        int tag = 0;
         while(query.next())
         {
-            QByteArray starting = query.value(0).toByteArray();
-            QByteArray terminal = query.value(1).toByteArray();
-            QByteArray date = query.value(2).toByteArray();
-            QByteArray flytime = query.value(3).toByteArray();
-            QByteArray seat_class = query.value(4).toByteArray();
-            QByteArray final = starting + " " + terminal + " " + date + " " + flytime + " " + seat_class + " " + airline_name;
-            result.push_back(final);
+            QByteArray b = query.value(0).toByteArray();
+            b = b + " ";
+            result.push_back(b);
+            tag++;
         }
-        return 1;
+        if(tag != 0){
+            return 1;
+        }
+        else{
+            return 0;
+        }
     }
 }
 
 
-int MainWindow::update_data(QString sql){
+int MainWindow::sql_operation(QString sql){
     QSqlQuery query(*database);
     QMutex mutex;
 
@@ -352,7 +394,7 @@ int MainWindow::update_data(QString sql){
     return 1;
 }
 
-int MainWindow::check_exsits(QString sql){
+int MainWindow::sql_select(QString sql){
     QSqlQuery query(*database);
     QMutex mutex;
 
@@ -379,30 +421,6 @@ int MainWindow::check_exsits(QString sql){
     }
 }
 
-int MainWindow::select_show_seat(vector<QByteArray> &result,QString sql){
-    QSqlQuery query(*database);
-    QMutex mutex;
-
-    mutex.lock();
-    bool isok = query.exec(sql);
-    mutex.unlock();
-
-    if(!isok)
-    {
-        return 0;
-    }
-    else
-    {
-        while(query.next())
-        {
-            QByteArray seat_number = query.value(0).toByteArray();
-            QByteArray final = seat_number + " ";
-            result.push_back(final);
-        }
-        return 1;
-    }
-}
-
 
 int MainWindow::create_order_number(QByteArray& number){
     QString sql;
@@ -411,7 +429,7 @@ int MainWindow::create_order_number(QByteArray& number){
 
     while(true){
         number = getRandomNumber();
-        sql = "select * from  `ticket` where `ordernumber` = '" + number + "';";
+        sql = "SELECT `ordernumber` from  order where `ordernumber` = '" + number + "';";
         mutex.lock();
         bool isok = query.exec(sql);
         mutex.unlock();
@@ -423,10 +441,10 @@ int MainWindow::create_order_number(QByteArray& number){
             while(query.next()){
                 tag++;
             }
-            if(tag != 0){
-                continue;
-            }else{
+            if(tag == 0){
                 return 1;
+            }else{
+                continue;
             }
         }
     }

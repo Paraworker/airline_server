@@ -31,6 +31,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QByteArray airline_name;
+    QByteArray airline_id;
     int server_port;
     QTcpServer* serverSocket;
     QTcpSocket* clientSocket[10];
@@ -54,14 +55,13 @@ private:
     void order(int i,QByteArray &text);
     void refund(int i,QByteArray &text);
     QString get_seat_name(QByteArray a);
-    int select_query(vector<QByteArray> &result,QString sql);
 
     int create_order_number(QByteArray& number);
     QByteArray getRandomNumber();
-    int check_exsits(QString sql);
-    int update_data(QString sql);
-    int select_refound(vector<QByteArray> &result,QString sql);
-    int select_show_seat(vector<QByteArray> &result,QString sql);
+
+    int sql_select(vector<QByteArray> &result,QString sql);
+    int sql_select(QString sql);
+    int sql_operation(QString sql);
 
 };
 #endif // MAINWINDOW_H
