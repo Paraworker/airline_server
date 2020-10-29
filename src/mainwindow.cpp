@@ -36,23 +36,23 @@ void MainWindow::on_startButton_clicked()
     if(database == nullptr){
         bool i = connect_to_database();
         if(i != true){
-            this->ui->listWidget->addItem("Connect to database failed!");
+            list_add("Connect to database failed!");
             return;
         }
         else{
-            this->ui->listWidget->addItem("Connect to database succeed!");
+            list_add("Connect to database succeed!");
         }
     }
     bool k = set_socket();
     if(k != true){
-        this->ui->listWidget->addItem("Set socket failed!");
+        list_add("Set socket failed!");
         return;
     }
     else{
-        this->ui->listWidget->addItem("Socket listening...");
+        list_add("Socket listening...");
     }
     this->ui->startButton->setDisabled(true);
-    this->ui->startButton->setText("Running");
+    list_add("Running");
 }
 
 bool MainWindow::connect_to_database(){
@@ -102,7 +102,7 @@ void MainWindow::after_newConnection(){
             break;
         }
         if(i == 9){
-            this->ui->listWidget->addItem("有新的客户端连接请求，但是连接的客户端数量已满");
+            list_add("有新的客户端连接请求，但是连接的客户端数量已满");
             return;
         }
     }
@@ -114,10 +114,10 @@ void MainWindow::after_newConnection(){
 
     connect(clientSocket[i],&QTcpSocket::disconnected,this,[=](){
         clientSocket[i] = nullptr;
-        this->ui->listWidget->addItem("A client disconnected");
+        list_add("A client disconnected");
     });
 
-    this->ui->listWidget->addItem("A client connected!      " + QString("[%1]:%2").arg(ip).arg(port));
+    list_add("A client connected!      " + QString("[%1]:%2").arg(ip).arg(port));
 }
 
 int MainWindow::check_type(QByteArray &text){
@@ -169,7 +169,7 @@ void MainWindow::air_query(int i,QByteArray &text){     //1%
         str++;
     }
 
-    this->ui->listWidget->addItem("[查询航班信息请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + get_seat_name(info[3]));
+    list_add("[查询航班信息请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + get_seat_name(info[3]));
 
     vector<QByteArray> result;  //flytime
     QString query_select_sql= "SELECT flight.`flytime` from flight,schedule where flight.`flightnumber` = schedule.`flightnumber` and flight.`starting` = '" + info[0] +  "' and flight.`terminal` = '" + info[1] + "' and schedule.`date` = '" + info[2] + "';";
@@ -182,17 +182,17 @@ void MainWindow::air_query(int i,QByteArray &text){     //1%
         }
 
         clientSocket[i]->write(b.toUtf8().data());
-        this->ui->listWidget->addItem("查询航班信息成功，结果已发回");
+        list_add("查询航班信息成功，结果已发回");
     }
     else if(check == 0){
         QString b = "1%";
         clientSocket[i]->write(b.toUtf8().data());
-        this->ui->listWidget->addItem("查询航班信息成功（无内容），结果已发回");
+        list_add("查询航班信息成功（无内容），结果已发回");
     }
     else {
         QByteArray b = "5%数据库查询航班信息失败！";
         clientSocket[i]->write(b);
-        this->ui->listWidget->addItem("数据库查询航班信息失败，结果已发回");
+        list_add("数据库查询航班信息失败，结果已发回");
     }
 }
 
@@ -208,7 +208,7 @@ void MainWindow::show_seat(int i,QByteArray &text){     //2%
         }
         str++;
     }
-    this->ui->listWidget->addItem("[座位信息请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + info[3] + " " + get_seat_name(info[4]));
+    list_add("[座位信息请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + info[3] + " " + get_seat_name(info[4]));
 
 
     vector<QByteArray> this_scheduleid;
@@ -225,25 +225,25 @@ void MainWindow::show_seat(int i,QByteArray &text){     //2%
             }
 
             clientSocket[i]->write(b1.toUtf8().data());
-            this->ui->listWidget->addItem("查询座位信息成功，结果已发回");
+            list_add("查询座位信息成功，结果已发回");
         }else if(check == 0){
             QString b1 = "2%";
             clientSocket[i]->write(b1.toUtf8().data());
-            this->ui->listWidget->addItem("查询座位信息成功（空内容），结果已发回");
+            list_add("查询座位信息成功（空内容），结果已发回");
         }
         else{
             QByteArray b2 = "5%数据库查询座位信息时失败！";
             clientSocket[i]->write(b2);
-            this->ui->listWidget->addItem("数据库查询座位信息时失败，结果已发回");
+            list_add("数据库查询座位信息时失败，结果已发回");
         }
     }else if(check2 == 0){
         QByteArray b3 = "2%并不存在这趟航班！";
         clientSocket[i]->write(b3);
-        this->ui->listWidget->addItem("并不存在这趟航班，结果已发回");
+        list_add("并不存在这趟航班，结果已发回");
     }else{
         QByteArray b5 = "5%检查航班是否存在时数据库操作失败！";
         clientSocket[i]->write(b5);
-        this->ui->listWidget->addItem("检查航班是否存在时数据库操作失败，结果已发回");
+        list_add("检查航班是否存在时数据库操作失败，结果已发回");
     }
 }
 
@@ -259,7 +259,7 @@ void MainWindow::order(int i,QByteArray &text){     //3%
         }
         str++;
     }
-    this->ui->listWidget->addItem("[订票请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + info[3] + get_seat_name(info[4]) + " 座位：" + info[5]);
+    list_add("[订票请求] " + info[0] + " -> " + info[1] + " " + info[2] + " " + info[3] + " " + get_seat_name(info[4]) + " 座位：" + info[5]);
 
 
     vector<QByteArray> this_scheduleid;
@@ -274,7 +274,7 @@ void MainWindow::order(int i,QByteArray &text){     //3%
             if(check1 == -1){
                 QByteArray msg = "5%生成订单号时数据库操作失败！";
                 clientSocket[i]->write(msg);
-                this->ui->listWidget->addItem("生成订单号时数据库操作失败，结果已发回");
+                list_add("生成订单号时数据库操作失败，结果已发回");
                 return;
             }
             QString order_insert_sql = "INSERT INTO ticket values('" + order_number + "','" + this_scheduleid[0] + "','" + info[4] + "','" +info[5] + "');";
@@ -282,35 +282,35 @@ void MainWindow::order(int i,QByteArray &text){     //3%
             if(check2 == 1){
                 QByteArray b1 = "3%订票成功！订单号为：" + order_number;
                 clientSocket[i]->write(b1);
-                this->ui->listWidget->addItem("订票成功！订单号为：" + order_number + ",结果已发回");
+                list_add("订票成功！订单号为：" + order_number + ",结果已发回");
             }else{
                 QByteArray b2 = "5%写入订单时数据库操作失败！";
                 clientSocket[i]->write(b2);
-                this->ui->listWidget->addItem("写入订单时数据库操作失败，结果已发回");
+                list_add("写入订单时数据库操作失败，结果已发回");
             }
         }else if (check == 1) {
             QByteArray b3 = "3%该座位已被选！";
             clientSocket[i]->write(b3);
-            this->ui->listWidget->addItem("座位已被选，结果已发回");
+            list_add("座位已被选，结果已发回");
         }else{
             QByteArray b5 = "5%查询座位时数据库操作失败！";
             clientSocket[i]->write(b5);
-            this->ui->listWidget->addItem("查询座位时数据库操作失败，结果已发回");
+            list_add("查询座位时数据库操作失败，结果已发回");
         }
 
     }else if(check1 == 0){
             QByteArray b3 = "3%并不存在这趟航班！";
             clientSocket[i]->write(b3);
-            this->ui->listWidget->addItem("并不存在这趟航班，结果已发回");
+            list_add("并不存在这趟航班，结果已发回");
     }else{
             QByteArray b5 = "5%检查航班是否存在时数据库操作失败！";
             clientSocket[i]->write(b5);
-            this->ui->listWidget->addItem("检查航班是否存在时数据库操作失败，结果已发回");
+            list_add("检查航班是否存在时数据库操作失败，结果已发回");
     }
 }
 
 void MainWindow::refund(int i,QByteArray &text){        //4%
-    this->ui->listWidget->addItem("[退票请求] 订单号：" + text);
+    list_add("[退票请求] 订单号：" + text);
     QString refund_select_sql = "SELECT `ordernumber` FROM  ticket where `ordernumber` = '" + text + "';";
     int check = sql_select(refund_select_sql);
     if(check == 1){
@@ -319,20 +319,20 @@ void MainWindow::refund(int i,QByteArray &text){        //4%
         if(check2 == 1){
             QByteArray b1 = "4%退票成功！";
             clientSocket[i]->write(b1);
-            this->ui->listWidget->addItem("退票成功，结果已发回");
+            list_add("退票成功，结果已发回");
         }else{
             QByteArray b2 = "5%退票时数据库操作失败！";
             clientSocket[i]->write(b2);
-            this->ui->listWidget->addItem("退票时数据库操作失败，结果已发回");
+            list_add("退票时数据库操作失败，结果已发回");
         }
     }else if(check == 0){
         QByteArray b3 = "4%无此订单！";
         clientSocket[i]->write(b3);
-        this->ui->listWidget->addItem("无此订单，结果已发回");
+        list_add("无此订单，结果已发回");
     }else{
         QByteArray b5 = "5%查询订单号时数据库操作失败！";
         clientSocket[i]->write(b5);
-        this->ui->listWidget->addItem("查询订单号时数据库操作失败，结果已发回");
+        list_add("查询订单号时数据库操作失败，结果已发回");
     }
 }
 
@@ -457,6 +457,11 @@ QByteArray MainWindow::getRandomNumber()
         b = b + QByteArray::number(QRandomGenerator::global()->bounded(10));
     }
     return b;
+}
+
+void MainWindow::list_add(QString s){
+    this->ui->listWidget->addItem(s);
+    this->ui->listWidget->scrollToBottom();
 }
 
 

@@ -47,6 +47,7 @@ private:
 
     bool connect_to_database();
     bool set_socket();
+    void list_add(QString s);
     int check_type(QByteArray &text);
     void message_handle(int i);
 
