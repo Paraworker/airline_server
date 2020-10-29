@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMutex>
-#include <QTime>
 #include <QRandomGenerator>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -283,7 +282,7 @@ void MainWindow::order(int i,QByteArray &text){     //3%
             if(check2 == 1){
                 QByteArray b1 = "3%订票成功！订单号为：" + order_number;
                 clientSocket[i]->write(b1);
-                this->ui->listWidget->addItem("订票成功，结果已发回");
+                this->ui->listWidget->addItem("订票成功！订单号为：" + order_number + ",结果已发回");
             }else{
                 QByteArray b2 = "5%写入订单时数据库操作失败！";
                 clientSocket[i]->write(b2);
