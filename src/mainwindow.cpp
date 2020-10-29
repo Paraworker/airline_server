@@ -217,7 +217,7 @@ void MainWindow::show_seat(int i,QByteArray &text){     //2%
     int check2 = sql_select(this_scheduleid,check_sql);
     if(check2 == 1){
         vector<QByteArray> result;      //存已经被订的座位
-        QString show_seat_select_sql = "SELECT `seatnumber` FROM order where `class` = '" + info[5] + "' and `scheduleid`  =  '" + this_scheduleid[0] +"';";
+        QString show_seat_select_sql = "SELECT `seatnumber` FROM ticket where `class` = '" + info[4] + "' and `scheduleid`  =  '" + this_scheduleid[0] +"';";
         int check = sql_select(result,show_seat_select_sql);
         if(check == 1){
             QString b1 = "2%";
@@ -267,7 +267,7 @@ void MainWindow::order(int i,QByteArray &text){     //3%
     QString check_sql = "SELECT `scheduleid` FROM flight,schedule where flight.`flightnumber` = schedule.`flightnumber` and flight.`starting` = '" + info[0] +  "' and flight.`terminal` = '" + info[1] + "' and schedule.`date` = '" + info[2] + "' and flight.`flytime` = '" + info[3] + "';";
     int check1 = sql_select(this_scheduleid,check_sql);
     if(check1 == 1){
-        QString order_select_sql = "SELECT `scheduleid` FROM order where `scheduleid`  = '" + this_scheduleid[0] + "' and `class` = '" + info[4] + "' and `seatnumber` = '" + info[5] + "';";
+        QString order_select_sql = "SELECT `scheduleid` FROM ticket where `scheduleid`  = '" + this_scheduleid[0] + "' and `class` = '" + info[4] + "' and `seatnumber` = '" + info[5] + "';";
         int check = sql_select(order_select_sql);
         if(check == 0){
             QByteArray order_number;
@@ -278,7 +278,7 @@ void MainWindow::order(int i,QByteArray &text){     //3%
                 this->ui->listWidget->addItem("生成订单号时数据库操作失败，结果已发回");
                 return;
             }
-            QString order_insert_sql = "INSERT INTO order values('" + order_number + "','" + this_scheduleid[0] + "','" + info[4] + "','" +info[5] + "');";
+            QString order_insert_sql = "INSERT INTO ticket values('" + order_number + "','" + this_scheduleid[0] + "','" + info[4] + "','" +info[5] + "');";
             int check2 = sql_operation(order_insert_sql);
             if(check2 == 1){
                 QByteArray b1 = "3%订票成功！订单号为：" + order_number;
@@ -312,10 +312,10 @@ void MainWindow::order(int i,QByteArray &text){     //3%
 
 void MainWindow::refund(int i,QByteArray &text){        //4%
     this->ui->listWidget->addItem("[退票请求] 订单号：" + text);
-    QString refund_select_sql = "SELECT `ordernumber` FROM  order where `ordernumber` = '" + text + "';";
+    QString refund_select_sql = "SELECT `ordernumber` FROM  ticket where `ordernumber` = '" + text + "';";
     int check = sql_select(refund_select_sql);
     if(check == 1){
-        QByteArray refund_update_sql = "DELETE FROM order where ordernumber = '"  + text + "';";
+        QByteArray refund_update_sql = "DELETE FROM ticket where ordernumber = '"  + text + "';";
         int check2 = sql_operation(refund_update_sql);
         if(check2 == 1){
             QByteArray b1 = "4%退票成功！";
@@ -428,7 +428,7 @@ int MainWindow::create_order_number(QByteArray& number){
 
     while(true){
         number = getRandomNumber();
-        sql = "SELECT `ordernumber` FROM  order where `ordernumber` = '" + number + "';";
+        sql = "SELECT `ordernumber` FROM  ticket where `ordernumber` = '" + number + "';";
         mutex.lock();
         bool isok = query.exec(sql);
         mutex.unlock();
