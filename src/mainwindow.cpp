@@ -52,7 +52,7 @@ void MainWindow::on_startButton_clicked()
         list_add("Socket listening...");
     }
     this->ui->startButton->setDisabled(true);
-    list_add("Running");
+    this->ui->startButton->setText("Running");
 }
 
 bool MainWindow::connect_to_database(){
