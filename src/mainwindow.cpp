@@ -161,7 +161,7 @@ void MainWindow::air_query(int i,QByteArray &text){     //1%
     QByteArray info[4];    //Starting Terminal date seat_class
     char* str = text.data();
     int tag = 0;
-    while(*str != '\0'){
+    while(*str != '\0' && tag < 4){
         if(*str == ' '){
             tag++;
         }else{
@@ -201,7 +201,7 @@ void MainWindow::show_seat(int i,QByteArray &text){     //2%
     QByteArray info[5];       //starting terminal date flytime seat_class
     char* str = text.data();
     int tag = 0;
-    while(*str != '\0'){
+    while(*str != '\0' && tag < 5){
         if(*str == ' '){
             tag++;
         }else{
@@ -213,11 +213,11 @@ void MainWindow::show_seat(int i,QByteArray &text){     //2%
 
 
     vector<QByteArray> this_scheduleid;
-    QString check_sql = "SELECT `scheduleid` from flight,schedule where flight.`flightnumber` = schedule.`flightnumber` and flight.`starting` = '" + info[0] +  "' and flight.`terminal` = '" + info[1] + "' and schedule.`date` = '" + info[2] + "' and flight.`flytime` = '" + info[3] + "';";
+    QString check_sql = "SELECT `scheduleid` FROM flight,schedule where flight.`flightnumber` = schedule.`flightnumber` and flight.`starting` = '" + info[0] +  "' and flight.`terminal` = '" + info[1] + "' and schedule.`date` = '" + info[2] + "' and flight.`flytime` = '" + info[3] + "';";
     int check2 = sql_select(this_scheduleid,check_sql);
     if(check2 == 1){
         vector<QByteArray> result;      //存已经被订的座位
-        QString show_seat_select_sql = "SELECT `seatnumber` from order where `class` = '" + info[5] + "' and `scheduleid`  =  '" + this_scheduleid[0] +"';";
+        QString show_seat_select_sql = "SELECT `seatnumber` FROM order where `class` = '" + info[5] + "' and `scheduleid`  =  '" + this_scheduleid[0] +"';";
         int check = sql_select(result,show_seat_select_sql);
         if(check == 1){
             QString b1 = "2%";
@@ -252,7 +252,7 @@ void MainWindow::order(int i,QByteArray &text){     //3%
     QByteArray info[6];    //Starting Terminal date flytime seat_class seat_number
     char* str = text.data();
     int tag = 0;
-    while(*str != '\0'){
+    while(*str != '\0' && tag < 6){
         if(*str == ' '){
             tag++;
         }else{
@@ -264,10 +264,10 @@ void MainWindow::order(int i,QByteArray &text){     //3%
 
 
     vector<QByteArray> this_scheduleid;
-    QString check_sql = "SELECT `scheduleid` from flight,schedule where flight.`flightnumber` = schedule.`flightnumber` and flight.`starting` = '" + info[0] +  "' and flight.`terminal` = '" + info[1] + "' and schedule.`date` = '" + info[2] + "' and flight.`flytime` = '" + info[3] + "';";
+    QString check_sql = "SELECT `scheduleid` FROM flight,schedule where flight.`flightnumber` = schedule.`flightnumber` and flight.`starting` = '" + info[0] +  "' and flight.`terminal` = '" + info[1] + "' and schedule.`date` = '" + info[2] + "' and flight.`flytime` = '" + info[3] + "';";
     int check1 = sql_select(this_scheduleid,check_sql);
     if(check1 == 1){
-        QString order_select_sql = "SELECT `scheduleid` from order where `scheduleid`  = '" + this_scheduleid[0] + "' and `class` = '" + info[4] + "' and `seatnumber` = '" + info[5] + "';";
+        QString order_select_sql = "SELECT `scheduleid` FROM order where `scheduleid`  = '" + this_scheduleid[0] + "' and `class` = '" + info[4] + "' and `seatnumber` = '" + info[5] + "';";
         int check = sql_select(order_select_sql);
         if(check == 0){
             QByteArray order_number;
@@ -312,7 +312,7 @@ void MainWindow::order(int i,QByteArray &text){     //3%
 
 void MainWindow::refund(int i,QByteArray &text){        //4%
     this->ui->listWidget->addItem("[退票请求] 订单号：" + text);
-    QString refund_select_sql = "SELECT `ordernumber` from  order where `ordernumber` = '" + text + "';";       //sql
+    QString refund_select_sql = "SELECT `ordernumber` FROM  order where `ordernumber` = '" + text + "';";
     int check = sql_select(refund_select_sql);
     if(check == 1){
         QByteArray refund_update_sql = "DELETE FROM order where ordernumber = '"  + text + "';";
@@ -428,7 +428,7 @@ int MainWindow::create_order_number(QByteArray& number){
 
     while(true){
         number = getRandomNumber();
-        sql = "SELECT `ordernumber` from  order where `ordernumber` = '" + number + "';";
+        sql = "SELECT `ordernumber` FROM  order where `ordernumber` = '" + number + "';";
         mutex.lock();
         bool isok = query.exec(sql);
         mutex.unlock();
@@ -441,6 +441,7 @@ int MainWindow::create_order_number(QByteArray& number){
                 tag++;
             }
             if(tag == 0){
+                number = airline_id + number;
                 return 1;
             }else{
                 continue;
