@@ -9,10 +9,18 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    //根据不同航空公司修改
     airline_name = "中国南方航空";
     airline_id = "CZ";
     server_port = 18103;
-    //根据不同航空公司修改
+
+    //airline_name = "中国国际航空";
+    //airline_id = "CA";
+    //server_port = 18104;
+
+    //airline_name = "中国东方航空";
+    //airline_id = "MU";
+    //server_port = 18105;
 
     this->ui->label_title->setText("Airline Server (" + airline_name + ")");
     for (int i = 0;i < 10;i++ ) {
