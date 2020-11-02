@@ -51,13 +51,15 @@ void MainWindow::on_startButton_clicked()
             list_add("Connect to database succeed!");
         }
     }
-    bool k = set_socket();
-    if(k != true){
-        list_add("Set socket failed!");
-        return;
-    }
-    else{
-        list_add("Socket listening...");
+    if(serverSocket == nullptr){
+        bool k = set_socket();
+        if(k != true){
+            list_add("Set socket failed!");
+            return;
+        }
+        else{
+            list_add("Socket listening...");
+        }
     }
     this->ui->startButton->setDisabled(true);
     this->ui->startButton->setText("Running");
